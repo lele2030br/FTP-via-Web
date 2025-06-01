@@ -11,6 +11,9 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 - **Upload** e **download** de arquivos
 - **Criação e exclusão** de pastas
 - **Criação e edição** de arquivos direto pelo navegador (incluindo modal para novo arquivo)
+- **Visualização de arquivos de texto** em modal
+- **Renomear** arquivos e pastas
+- **Mover** arquivos e pastas para outros diretórios
 - **Suporte a múltiplos dispositivos** (responsivo)
 - **Interface intuitiva** com ícones e feedback visual
 
@@ -43,8 +46,8 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 ## Como Usar
 
 1. **Login:** Informe host, usuário e senha do FTP.
-2. **Gerencie arquivos:** Faça upload, download, edite, crie ou exclua arquivos/pastas.
-3. **Criação/Edição:** Use os botões ou ícones ao lado de cada arquivo para editar ou criar novos arquivos.
+2. **Gerencie arquivos:** Faça upload, download, edite, visualize, mova, crie ou exclua arquivos/pastas.
+3. **Criação/Edição:** Use os botões ou ícones ao lado de cada arquivo para editar, visualizar, mover, renomear ou criar novos arquivos.
 4. **Logout:** Use o botão "Sair" para encerrar a sessão.
 
 ## Segurança
