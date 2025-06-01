@@ -18,8 +18,12 @@ $_SESSION['ftp_dir'] = $dir;
 $message = '';
 $edit_content = '';
 $edit_filename = '';
+$view_content = '';
+$view_filename = '';
+$rename_filename = '';
+$move_filename = '';
 
-/** NOVO: criar arquivo */
+// Criar arquivo
 if (isset($_POST['create_file'])) {
     $new_file = trim($_POST['file_name']);
     $new_content = $_POST['file_content'];
@@ -35,7 +39,7 @@ if (isset($_POST['create_file'])) {
     }
 }
 
-/** NOVO: salvar edição */
+// Salvar edição
 if (isset($_POST['save_edit'])) {
     $edit_filename = $_POST['edit_filename'];
     $edit_content = $_POST['edit_content'];
@@ -49,7 +53,7 @@ if (isset($_POST['save_edit'])) {
     unlink($local_tmp);
 }
 
-/** NOVO: abrir para edição */
+// Abrir para edição
 if (isset($_GET['edit'])) {
     $edit_filename = $_GET['edit'];
     $local_tmp = tempnam(sys_get_temp_dir(), 'ftpedit');
@@ -61,7 +65,47 @@ if (isset($_GET['edit'])) {
     unlink($local_tmp);
 }
 
-/** RESTANTE IGUAL */
+// Visualizar arquivo de texto
+if (isset($_GET['view'])) {
+    $view_filename = $_GET['view'];
+    $local_tmp = tempnam(sys_get_temp_dir(), 'ftpview');
+    if (ftp_get($conn_id, $local_tmp, $dir . $view_filename, FTP_ASCII)) {
+        $view_content = htmlspecialchars(file_get_contents($local_tmp));
+    } else {
+        $message = "Falha ao abrir o arquivo para visualização.";
+    }
+    unlink($local_tmp);
+}
+
+// Renomear arquivo ou pasta
+if (isset($_GET['rename'])) {
+    $rename_filename = $_GET['rename'];
+}
+if (isset($_POST['do_rename'])) {
+    $old_name = $_POST['old_name'];
+    $new_name = $_POST['new_name'];
+    if (ftp_rename($conn_id, $dir . $old_name, $dir . $new_name)) {
+        $message = "Renomeado com sucesso!";
+    } else {
+        $message = "Falha ao renomear.";
+    }
+}
+
+// Mover arquivo ou pasta
+if (isset($_GET['move'])) {
+    $move_filename = $_GET['move'];
+}
+if (isset($_POST['do_move'])) {
+    $move_name = $_POST['move_name'];
+    $target_dir = rtrim($_POST['target_dir'], '/') . '/';
+    if (ftp_rename($conn_id, $dir . $move_name, $target_dir . $move_name)) {
+        $message = "Movido com sucesso!";
+    } else {
+        $message = "Falha ao mover.";
+    }
+}
+
+// Criar pasta
 if (isset($_POST['create_folder'])) {
     $new_folder = trim($_POST['folder_name']);
     if ($new_folder) {
@@ -73,6 +117,7 @@ if (isset($_POST['create_folder'])) {
     }
 }
 
+// Upload
 if (isset($_POST['upload'])) {
     $file = $_FILES['file'];
     if ($file['error'] === 0) {
@@ -81,6 +126,7 @@ if (isset($_POST['upload'])) {
     }
 }
 
+// Excluir arquivo ou pasta
 if (isset($_GET['delete'])) {
     $target = $dir . $_GET['delete'];
     if (@ftp_delete($conn_id, $target)) {
@@ -92,6 +138,7 @@ if (isset($_GET['delete'])) {
     }
 }
 
+// Download
 if (isset($_GET['download'])) {
     $target = $dir . $_GET['download'];
     $local = tempnam(sys_get_temp_dir(), 'ftp');
@@ -130,8 +177,10 @@ function upper_dir($dir) {
         .table-responsive { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 16px; }
         .navbar { margin-bottom: 32px; }
         .ftp-folder { color: #0d6efd; font-weight: 500; }
-        .ftp-actions a { margin-right: 8px; }
+        .ftp-actions a { margin-right: 5px; margin-bottom: 4px; }
         @media (max-width: 600px) { .table-responsive { padding: 4px; } }
+        .modal-backdrop { z-index: 1050; }
+        .modal { z-index: 1060; }
     </style>
 </head>
 <body>
@@ -149,7 +198,7 @@ function upper_dir($dir) {
             <div class="alert alert-info"><?= $message ?></div>
         <?php endif; ?>
 
-        <!-- NOVO: Botão para modal de novo arquivo -->
+        <!-- Botão para modal de novo arquivo -->
         <div class="mb-3">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFileModal">
                 <i class="bi bi-file-earmark-plus"></i> Novo Arquivo
@@ -205,11 +254,16 @@ function upper_dir($dir) {
                             <td class="ftp-actions text-end">
                                 <?php if ($item['is_dir']): ?>
                                     <a href="?dir=<?=urlencode($dir . $item['name'])?>/" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                    <a href="?rename=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-secondary">Renomear</a>
+                                    <a href="?move=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-dark">Mover</a>
                                     <a href="?delete=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-danger"
                                        onclick="return confirm('Excluir pasta?')">Excluir</a>
                                 <?php else: ?>
                                     <a href="?download=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-success">Baixar</a>
+                                    <a href="?view=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-info">Visualizar</a>
                                     <a href="?edit=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-warning">Editar</a>
+                                    <a href="?rename=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-secondary">Renomear</a>
+                                    <a href="?move=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-dark">Mover</a>
                                     <a href="?delete=<?=urlencode($item['name'])?>" class="btn btn-sm btn-outline-danger"
                                        onclick="return confirm('Excluir arquivo?')">Excluir</a>
                                 <?php endif;?>
@@ -226,7 +280,7 @@ function upper_dir($dir) {
         </div>
     </div>
 
-    <!-- NOVO: Modal para criar arquivo -->
+    <!-- Modal para criar arquivo -->
     <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -254,7 +308,7 @@ function upper_dir($dir) {
       </div>
     </div>
 
-    <!-- NOVO: Modal para editar arquivo -->
+    <!-- Modal para editar arquivo -->
     <?php if ($edit_filename): ?>
     <div class="modal fade show" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-modal="true" style="display:block;">
       <div class="modal-dialog modal-lg">
@@ -271,6 +325,81 @@ function upper_dir($dir) {
             <div class="modal-footer">
               <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn btn-secondary">Cancelar</a>
               <button type="submit" name="save_edit" class="btn btn-primary">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+      <script>document.body.classList.add('modal-open');</script>
+    </div>
+    <?php endif; ?>
+
+    <!-- Modal para visualizar arquivo -->
+    <?php if ($view_filename): ?>
+    <div class="modal fade show" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-modal="true" style="display:block;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="viewFileModalLabel">Visualizar Arquivo: <?=htmlspecialchars($view_filename)?></h5>
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+              <pre style="white-space: pre-wrap;"><?= $view_content ?></pre>
+            </div>
+            <div class="modal-footer">
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn btn-secondary">Fechar</a>
+            </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+      <script>document.body.classList.add('modal-open');</script>
+    </div>
+    <?php endif; ?>
+
+    <!-- Modal para renomear arquivo/pasta -->
+    <?php if ($rename_filename): ?>
+    <div class="modal fade show" id="renameFileModal" tabindex="-1" aria-labelledby="renameFileModalLabel" aria-modal="true" style="display:block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="renameFileModalLabel">Renomear: <?=htmlspecialchars($rename_filename)?></h5>
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="old_name" value="<?=htmlspecialchars($rename_filename)?>">
+              <input type="text" name="new_name" class="form-control" value="<?=htmlspecialchars($rename_filename)?>" required>
+            </div>
+            <div class="modal-footer">
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn btn-secondary">Cancelar</a>
+              <button type="submit" name="do_rename" class="btn btn-primary">Renomear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+      <script>document.body.classList.add('modal-open');</script>
+    </div>
+    <?php endif; ?>
+
+    <!-- Modal para mover arquivo/pasta -->
+    <?php if ($move_filename): ?>
+    <div class="modal fade show" id="moveFileModal" tabindex="-1" aria-labelledby="moveFileModalLabel" aria-modal="true" style="display:block;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="moveFileModalLabel">Mover: <?=htmlspecialchars($move_filename)?></h5>
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="move_name" value="<?=htmlspecialchars($move_filename)?>">
+              <label>Destino (diretório FTP, ex: /outra/pasta/):</label>
+              <input type="text" name="target_dir" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+              <a href="<?=htmlspecialchars($_SERVER['PHP_SELF'])?>" class="btn btn-secondary">Cancelar</a>
+              <button type="submit" name="do_move" class="btn btn-primary">Mover</button>
             </div>
           </form>
         </div>
