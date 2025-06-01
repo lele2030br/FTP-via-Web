@@ -68,4 +68,4 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 
 ---
 
-**Feito com ♥ por [Lelebr2030]**
+**Feito com ♥ por [Lele2030br]**
