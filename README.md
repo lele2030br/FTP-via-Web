@@ -1,6 +1,4 @@
-# FTP-via-Web
-
-# Gerenciador FTP em PHP
+# FTP via Web
 
 Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, desenvolvido em PHP e utilizando [Bootstrap 5](https://getbootstrap.com/) para uma interface bonita e adaptável a qualquer dispositivo.
 
@@ -14,6 +12,7 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 - **Visualização de arquivos de texto** em modal
 - **Renomear** arquivos e pastas
 - **Mover** arquivos e pastas para outros diretórios
+- **Alterar permissões (chmod) de arquivos e pastas**
 - **Suporte a múltiplos dispositivos** (responsivo)
 - **Interface intuitiva** com ícones e feedback visual
 
@@ -46,8 +45,8 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 ## Como Usar
 
 1. **Login:** Informe host, usuário e senha do FTP.
-2. **Gerencie arquivos:** Faça upload, download, edite, visualize, mova, crie ou exclua arquivos/pastas.
-3. **Criação/Edição:** Use os botões ou ícones ao lado de cada arquivo para editar, visualizar, mover, renomear ou criar novos arquivos.
+2. **Gerencie arquivos:** Faça upload, download, edite, visualize, mova, crie, exclua arquivos/pastas ou altere permissões (chmod).
+3. **Criação/Edição:** Use os botões ou ícones ao lado de cada arquivo para editar, visualizar, mover, renomear, criar, excluir ou alterar permissões.
 4. **Logout:** Use o botão "Sair" para encerrar a sessão.
 
 ## Segurança
@@ -62,8 +61,8 @@ Um sistema web moderno e responsivo para gerenciar arquivos em servidores FTP, d
 
 ## Screenshots
 
-> <a href="https://ibb.co/QF6W2b8c"><img src="https://i.ibb.co/DD7BxVGb/Screenshot-2025-06-01-10-26-19-458-com-android-chrome-2.jpg" alt="Screenshot-2025-06-01-10-26-19-458-com-android-chrome-2" border="0"></a>
-<a href="https://ibb.co/39PZsSFr"><img src="https://i.ibb.co/LXs7P9gk/Screenshot-2025-06-01-10-25-35-777-com-android-chrome-2.jpg" alt="Screenshot-2025-06-01-10-25-35-777-com-android-chrome-2" border="0"></a>
+> <a href="https://ibb.co/QF6W2b8c"><img src="https://i.ibb.co/DD7BxVGb/Screenshot-2025-06-01-10-26-19-458-com-android-chrome-2.jpg" alt="Screenshot" border="0"></a>
+> <a href="https://ibb.co/39PZsSFr"><img src="https://i.ibb.co/LXs7P9gk/Screenshot-2025-06-01-10-25-35-777-com-android-chrome-2.jpg" alt="Screenshot" border="0"></a>
 
 ## Licença
 
